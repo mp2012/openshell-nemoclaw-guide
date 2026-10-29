@@ -447,6 +447,10 @@ curl -sS -m 600 http://127.0.0.1:11434/api/generate \
 
 超时配置无需修改：沙箱内 `/sandbox/.openclaw/openclaw.json` 中 `agents.defaults.timeoutSeconds` 与 `agents.defaults.inference.timeoutSeconds` 均已是 600。
 
+模型预热恢复正常后，同一界面即可正常对话。下图为 agent 对"你能做什么？"的实测回复（端到端验证通过）：
+
+![聊天验证成功：agent 正常回复](screenshots/06-chat-success.png)
+
 ## 5. "连接被重置"排障（网关 ForwardTcp 资源耗尽）
 
 症状：浏览器访问 `localhost:18789` 报"连接被重置"：

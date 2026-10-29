@@ -34,6 +34,7 @@
 <img src="screenshots/03-connect-and-auth-token-redacted.png" width="360" alt="沙箱内取令牌（已打码）"/>
 <img src="screenshots/04-conn-reset-forward-down.png" width="360" alt="浏览器连接被重置"/>
 <img src="screenshots/05-chat-timeout-cold-load.png" width="360" alt="首条消息超时"/>
+<img src="screenshots/06-chat-success.png" width="360" alt="聊天验证成功"/>
 </div>
 
 ### 1. Dashboard 登录页
@@ -51,6 +52,10 @@
 ### 4. 首条消息超时
 ![首条消息超时](screenshots/05-chat-timeout-cold-load.png)
 > Ollama 模型冷加载导致，预热后可避免。
+
+### 5. 聊天验证成功
+![聊天验证成功](screenshots/06-chat-success.png)
+> 模型预热后，agent（`qwen3.8:27b`）在 Dashboard 正常回复，部署端到端验证通过。
 
 ## 安全声明
 
