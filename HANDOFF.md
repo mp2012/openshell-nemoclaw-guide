@@ -56,7 +56,7 @@
 目录：`/home/azureuser/openshell-nemoclaw-guide/`
 
 - `OpenShell-NemoClaw-安全智能体部署教程.md`（约 19KB，488 行）—— 安装部署教程 + 策略字段完全版 + **部署后使用实录（含 4 张截图：登录页 / 取令牌 / 连接重置排障 / 首条超时）**，官方命令部分逐字来自官方文档。
-- `screenshots/`——部署使用过程截图（共 4 张；其中 `03-connect-and-auth-token.png` 因含明文 Gateway 令牌**未纳入公开仓库**，已在教程中脱敏省略）。
+- `screenshots/`——部署使用过程截图（共 5 个文件；原始 `03-connect-and-auth-token.png` 含明文令牌仅存本地、被 `.gitignore` 排除不入仓，教程引用的是打码版 `03-connect-and-auth-token-redacted.png`）。
 - `HANDOFF.md`（本文件）。
 
 ---

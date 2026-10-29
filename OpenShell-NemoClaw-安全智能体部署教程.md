@@ -420,7 +420,9 @@ openclaw gateway auth-token --show       # 打印令牌（交互终端才允许�
 exit                                      # 退回宿主机
 ```
 
-> 注：本步骤原配一张终端截图，因图中展示**明文 Gateway 令牌**，公开发布的仓库已脱敏省略该图。命令如上，照做即可（令牌仅在交互终端打印，切勿截图外发）。
+![进入沙箱并用 openclaw gateway auth-token --show 取令牌（令牌已打码）](screenshots/03-connect-and-auth-token-redacted.png)
+
+> 注：上图令牌已打码。明文令牌仅在交互终端打印，切勿将带令牌的截图外发/提交；一旦泄露立即轮换：沙箱内 `openclaw doctor --generate-gateway-token`。
 
 > ⚠️ 上图含明文令牌：令牌等于 agent 的完全访问凭证，文档/截图对外分享前务必打码；已泄露时在沙箱内执行 `openclaw doctor --generate-gateway-token` 轮换。
 
