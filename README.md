@@ -25,6 +25,24 @@
 3. **Gateway 令牌只在交互终端打印**，`nemoclaw dashboard-url` 非交互调用会失败。
 4. **网关重启后 `18789` 转发进程不会自动恢复** → `systemctl --user restart nemoclaw-openshell-gateway` + 手动重建 `openshell forward`。
 
+## 截图实录
+
+### 1. Dashboard 登录页
+![Dashboard 登录页](screenshots/02-dashboard-login.png)
+> 登录需填入 Gateway 令牌；WebSocket URL 保持 `ws://localhost:18789`。
+
+### 2. 沙箱内取 Gateway 令牌（已打码）
+![沙箱内取令牌](screenshots/03-connect-and-auth-token-redacted.png)
+> 进沙箱 `nemoclaw my-assistant connect` 后执行 `openclaw gateway auth-token --show`；令牌仅在交互终端打印，图中已打码。
+
+### 3. 浏览器"连接被重置"故障
+![连接被重置](screenshots/04-conn-reset-forward-down.png)
+> 网关重启后 18789 转发进程未自动恢复时的表现，需手动重建转发。
+
+### 4. 首条消息超时
+![首条消息超时](screenshots/05-chat-timeout-cold-load.png)
+> Ollama 模型冷加载导致，预热后可避免。
+
 ## 安全声明
 
 - 仓库内**不含任何明文令牌**；含令牌的截图仅本地留存并脱敏，未提交。
