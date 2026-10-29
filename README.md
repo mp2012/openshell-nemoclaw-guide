@@ -27,6 +27,15 @@
 
 ## 截图实录
 
+下面是本次部署实测的关键截图**汇总**（详细说明见各小节）：
+
+<div align="center">
+<img src="screenshots/02-dashboard-login.png" width="360" alt="Dashboard 登录页"/>
+<img src="screenshots/03-connect-and-auth-token-redacted.png" width="360" alt="沙箱内取令牌（已打码）"/>
+<img src="screenshots/04-conn-reset-forward-down.png" width="360" alt="浏览器连接被重置"/>
+<img src="screenshots/05-chat-timeout-cold-load.png" width="360" alt="首条消息超时"/>
+</div>
+
 ### 1. Dashboard 登录页
 ![Dashboard 登录页](screenshots/02-dashboard-login.png)
 > 登录需填入 Gateway 令牌；WebSocket URL 保持 `ws://localhost:18789`。
