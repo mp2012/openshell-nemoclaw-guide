@@ -31,7 +31,7 @@
 | CPU/内存/磁盘 | AMD EPYC 7V13 ×24 核 / 216GB / 641GB 可用 ✅ |
 | GPU | NVIDIA A100 80GB，Driver 595.91，CUDA 13.2 ✅（可做本地 vLLM 推理） |
 | 容器 | Docker 29.1.3 + nvidia-container-runtime（GPU 透传就绪）✅ |
-| 权限 | `azureuser` 在 `sudo` + `docker` 组 ✅ |
+| 权限 | `<user>` 在 `sudo` + `docker` 组 ✅ |
 | pip | 未安装；apt 可装 `python3-pip`，但 **OpenShell 运行时不走 pip**（见坑#2） |
 | GitHub | 直连超时（IPv6 问题），**SSH 已认证可用**，raw/ghcr/nvcr/PyPI 可达 ✅ |
 
@@ -47,13 +47,13 @@
 - **坑#3 — NemoClaw Express 仅在 DGX/WSL 触发**：本机为通用 Azure Ubuntu VM，不会弹 Express 提示，需用**非交互式环境变量**安装（已给出完整 env 清单）。
 - **坑#4 — Node 版本**：NemoClaw 依赖 **Node.js 22.16+**（凭据表单需 22.19+）、npm 10+；本机当前未安装，安装器可自动补齐，或用环境变量传 key（如 `NVIDIA_INFERENCE_API_KEY`）绕过凭据表单。（注：其他资料曾写"Node 20+"，以官方 README 的 22.16+ 为准。）
 - **坑#5 — NemoClaw 托管环境禁止直接动 OpenShell（官方原文）**：NemoClaw README 规定，在 NemoClaw 托管环境下，需创建/重建 OpenShell 网关或沙箱时一律用 `nemoclaw onboard`；**除非打算单独管理 OpenShell 并随后重跑 `nemoclaw onboard`，否则避免直接执行** `openshell self-update`、`npm update -g openshell`、`openshell gateway start --recreate`、`openshell sandbox create`。本项目（OpenShell + NemoClaw 并用）应以 `nemoclaw` CLI 为主入口。
-- **坑#6 — Ollama 须绑回环，且会切断经 `host.docker.internal` 访问 Ollama 的其它容器**：NemoClaw onboard 的安全检查要求 Ollama 仅监听 `127.0.0.1`（否则其 protected loopback route 的令牌校验会被绕过）。本机原有 `ollama` 容器发布在 `0.0.0.0:11434`，且被 `aicomic-middleware-api-1` / `aicomic-middleware-worker-1` 经 `OLLAMA_URL=http://host.docker.internal:11434` 依赖。最终按用户决定**重建 `ollama` 容器为仅绑 `127.0.0.1:11434`**（middleware 失去 Ollama 访问，由用户确认可接受）。重建命令见第 6 节。
+- **坑#6 — Ollama 须绑回环，且会切断经 `host.docker.internal` 访问 Ollama 的其它容器**：NemoClaw onboard 的安全检查要求 Ollama 仅监听 `127.0.0.1`（否则其 protected loopback route 的令牌校验会被绕过）。本机原有 `ollama` 容器发布在 `0.0.0.0:11434`，且被 `<middleware-api-container>` / `<middleware-worker-container>` 经 `OLLAMA_URL=http://host.docker.internal:11434` 依赖。最终按用户决定**重建 `ollama` 容器为仅绑 `127.0.0.1:11434`**（middleware 失去 Ollama 访问，由用户确认可接受）。重建命令见第 6 节。
 
 ---
 
 ## 5. 已产出物
 
-目录：`/home/azureuser/openshell-nemoclaw-guide/`
+目录：`/home/<user>/openshell-nemoclaw-guide/`
 
 - `OpenShell-NemoClaw-安全智能体部署教程.md`（约 19KB，488 行）—— 安装部署教程 + 策略字段完全版 + **部署后使用实录（含 4 张截图：登录页 / 取令牌 / 连接重置排障 / 首条超时）**，官方命令部分逐字来自官方文档。
 - `screenshots/`——部署使用过程截图（共 5 个文件；原始 `03-connect-and-auth-token.png` 含明文令牌仅存本地、被 `.gitignore` 排除不入仓，教程引用的是打码版 `03-connect-and-auth-token-redacted.png`）。
@@ -71,13 +71,13 @@
 3. **Ollama 回环化（坑#6）**：现有 `ollama` 容器发布 `0.0.0.0:11434` 被 NemoClaw 安全检查拒绝。按用户决定**重建为仅绑 `127.0.0.1:11434`**（middleware 失去 Ollama 由用户承担）。命令：
    ```bash
    docker stop ollama && docker rm ollama
-   docker run -d --name ollama --restart unless-stopped --network nocobase-ai_default \
+   docker run -d --name ollama --restart unless-stopped --network <docker-network> \
      -p 127.0.0.1:11434:11434 \
      -e OLLAMA_HOST=0.0.0.0:11434 -e OLLAMA_MAX_LOADED_MODELS=1 \
      -e OLLAMA_CONTEXT_LENGTH=32768 -e OLLAMA_KEEP_ALIVE=1h \
      -e NVIDIA_DRIVER_CAPABILITIES=compute,utility -e NVIDIA_VISIBLE_DEVICES=all \
      -e LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64 \
-     -v /home/azureuser/nocobase-ai/ollama:/root/.ollama \
+     -v /home/<user>/<data-dir>/ollama:/root/.ollama \
      ollama/ollama:latest serve
    ```
 4. **执行安装与续跑**：
@@ -92,13 +92,13 @@
 
 ### 6.2 验证（实测）
 - `nemoclaw my-assistant status`：Phase Ready；Inference(ollama backend) healthy `http://127.0.0.1:11434/api/tags`；auth proxy healthy `:11435`；**Policies: none**（尚未附加，见第 7 节）。
-- `ss -ltnp`：Dashboard `127.0.0.1:18789`、OpenShell 网关 `127.0.0.1:8080` + `172.24.0.1:8080` 均在监听（注：文档所述网关端口 `17670` 为旧版/其它构建；**以本机 `ss -ltnp` 实测的 `8080` 为准**）。
+- `ss -ltnp`：Dashboard `127.0.0.1:18789`、OpenShell 网关 `127.0.0.1:8080` + `<gateway-internal-ip>:8080` 均在监听（注：文档所述网关端口 `17670` 为旧版/其它构建；**以本机 `ss -ltnp` 实测的 `8080` 为准**）。
 - 推理路由：日志 "Native local inference responds inside the sandbox" ✅。
 
 ### 6.3 访问方式
 - 本机浏览器：`http://127.0.0.1:18789/`
 - 终端交互：`nemoclaw launch my-assistant`
-- 远程（SSH 会话）：`ssh -L 18789:127.0.0.1:18789 azureuser@<host>` 后开上方 URL
+- 远程（SSH 会话）：`ssh -L 18789:127.0.0.1:18789 <user>@<host>` 后开上方 URL
 - Dashboard 令牌 URL：`nemoclaw my-assistant dashboard-url --quiet`（含网关令牌，勿外泄）
 
 ---
@@ -110,7 +110,7 @@
 1. **策略预设/实战（当前最紧迫）**：`nemoclaw my-assistant status` 显示 `Policies: none`。建议按教程接入 NemoClaw 默认拒绝策略（`nemoclaw-blueprint/policies/openclaw-sandbox.yaml`）或仓库 presets，并**验证"访问未授权域名被拦截"**（用 `openshell term` 实时批准/拒绝；一次性批准仅对当前会话有效）。
 2. **（可选文档补全）** 把 `landlock` 与 `network_middlewares` 的嵌套字段补进教程（schema.mdx 中已有，本轮未逐字展开）。
 3. **本地推理备选**：若后续想用 `vllm` 而非 Ollama，需在 A100 起 vLLM 服务并托管模型，再 `nemoclaw inference set --provider vllm --sandbox my-assistant`。
-4. **middleware 影响跟进**：`aicomic-middleware-api/worker-1` 因 Ollama 改回环已失去 Ollama 访问；若需恢复，可单独给 middleware 起一个仍发布在 `0.0.0.0` 的 Ollama，或将其 `OLLAMA_URL` 改指向其它可用 Ollama 实例。
+4. **middleware 影响跟进**：`<middleware-containers>` 因 Ollama 改回环已失去 Ollama 访问；若需恢复，可单独给 middleware 起一个仍发布在 `0.0.0.0` 的 Ollama，或将其 `OLLAMA_URL` 改指向其它可用 Ollama 实例。
 
 ---
 
