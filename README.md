@@ -60,7 +60,7 @@
 ## 安全声明
 
 - 仓库内**不含任何明文令牌**；含令牌的截图仅本地留存并脱敏，未提交。
-- 切勿将带 Gateway 令牌的截图 / URL 外发；泄露后沙箱内 `openclaw doctor --generate-gateway-token` 轮换。
+- 切勿将带 Gateway 令牌的截图 / URL 外发。**泄露后轮换方法（已实测）**：沙箱内 `openclaw doctor --generate-gateway-token` 生成新令牌，再 `systemctl --user restart nemoclaw-openshell-gateway` 使其生效；**重启后 Dashboard 会话会被踢，需重新取令牌登录**（令牌仅交互终端可见：`openclaw gateway auth-token --show`）。注意 OpenClaw 后台自动更新也会重启网关并可能更换令牌，更新后若登录失败请重新取令牌。
 
 ## 适用环境
 

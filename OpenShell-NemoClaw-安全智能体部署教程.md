@@ -422,9 +422,9 @@ exit                                      # 退回宿主机
 
 ![进入沙箱并用 openclaw gateway auth-token --show 取令牌（令牌已打码）](screenshots/03-connect-and-auth-token-redacted.png)
 
-> 注：上图令牌已打码。明文令牌仅在交互终端打印，切勿将带令牌的截图外发/提交；一旦泄露立即轮换：沙箱内 `openclaw doctor --generate-gateway-token`。
+> 注：上图令牌已打码。明文令牌仅在交互终端打印，切勿将带令牌的截图外发/提交；一旦泄露，轮换方法（已实测）：沙箱内 `openclaw doctor --generate-gateway-token` 生成新令牌，再 `systemctl --user restart nemoclaw-openshell-gateway` 使其生效；**重启后 Dashboard 会被踢，需重新取令牌登录**。
 
-> ⚠️ 上图含明文令牌：令牌等于 agent 的完全访问凭证，文档/截图对外分享前务必打码；已泄露时在沙箱内执行 `openclaw doctor --generate-gateway-token` 轮换。
+> ⚠️ 上图含明文令牌：令牌等于 agent 的完全访问凭证，文档/截图对外分享前务必打码；已泄露时：沙箱内 `openclaw doctor --generate-gateway-token` 生成新令牌，并 `systemctl --user restart nemoclaw-openshell-gateway` 使其生效，**重启后重新取令牌登录**。注意：OpenClaw 后台自动更新也会重启网关并可能更换令牌，更新后若登录失败请重新取令牌。
 
 ## 3. 登录页填令牌
 
